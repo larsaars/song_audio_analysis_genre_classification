@@ -6,8 +6,5 @@ playlists = '''7qACZGMjyo64TdUdKAegjp 3HYK6ri0GkvRcM6GkKh0hJ
             0TcXdt4sbITbwCwwFbKYyd 7dowgSWOmvdpwNkGFMUs6e 6I0NsYzfoj7yHXyvkZYoRx
             47RSt6JBM6AbqBxtggW1Jk'''.split()
 
-columns = ['genre', 'danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness',
-           'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
-
-db_file = 'datasets/songs_main_genres.csv'
+db_file = 'datasets/songs_audio_analysis.csv'
 model_file = 'models/model.pkl'

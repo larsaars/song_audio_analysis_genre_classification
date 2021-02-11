@@ -2,10 +2,10 @@
 create database by collecting song features from playlists which we know the genre of
 """
 
-import spotipy
 import pandas as pd
 import global_variables as gv
 from login_spotify import sp
+import numpy as np
 
 to_append = []
 
@@ -25,25 +25,22 @@ for g in zip(gv.genres, gv.playlists):
 
     # get audio features for 50 tracks at a time (spotipy only allows 50 at once)
     # code below can be looped if more tracks need to be analyzed
-    for from_idx in range(0, len(tracks_list), 50):
+    for track_idx in range(len(tracks_list)):
+        try:
+            bars = sp.audio_analysis(tracks_list[track_idx])['bars']
+            confidences_collected = []
 
-        to_idx = from_idx + 50
-        if to_idx > len(tracks_list):
-            to_idx = len(tracks_list)
+            # loop through all bars
+            for bar in bars:
+                confidences_collected.append(bar['confidence'])
 
-        tracks_af = sp.audio_features(tracks_list[from_idx:to_idx])
+            arr_len = len(confidences_collected)
+            group = arr_len // 45
+            leftover = arr_len - (arr_len % group)
+            confidences = np.array(confidences_collected[:leftover]).reshape(-1, group).mean(axis=1)
 
-        for track_num in range(0, 50):
-            ft = tracks_af[track_num]
-            track_data = [g[0], ft['danceability'], ft['energy'], ft['key'],
-                          ft['loudness'], ft['mode'],
-                          ft['speechiness'], ft['acousticness'],
-                          ft['instrumentalness'], ft['liveness'],
-                          ft['valence'], ft['tempo']]
-            to_append.append(track_data)
-
-# create the data frame
-audio_data = pd.DataFrame(to_append, columns=gv.columns)
-
-# and save as csv
-audio_data.to_csv(gv.db_file, sep=';', index=False)
+            to_append.append([g[0]] + confidences.tolist())
+        except:
+            pass
+# create the data frame and save
+pd.DataFrame(to_append).to_csv(gv.db_file, sep=';', index=False)

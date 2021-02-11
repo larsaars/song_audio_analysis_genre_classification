@@ -9,9 +9,11 @@ import global_variables as gv
 
 # read df, make genres to str lists and drop all empty genres lists then
 df = pd.read_csv(gv.db_file, sep=';')
-# df['genre'] = df.genre.apply(literal_eval)
-df = df[df.genre.apply(lambda gen: len(gen)) != 0]
-# delete index column
+
+# make nan to 0 in every column
+for column in df:
+    if column != 'genre':
+        df[column] = df[column].fillna(0)
 
 
 # print the header of the df
